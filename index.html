@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ВолейБол | Защита от травм</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #E8FF00;
+    --accent2: #FF4D1C;
+    --dark: #0D0D0D;
+    --dark2: #141414;
+    --dark3: #1E1E1E;
+    --mid: #2A2A2A;
+    --light: #F0F0EC;
+    --muted: #888;
+    --white: #FFFFFF;
+    --nav-h: 68px;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--light);
+    font-family: 'Mulish', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform .1s, width .3s, height .3s, background .3s;
+    mix-blend-mode: difference;
+  }
+  .cursor.big { width: 40px; height: 40px; background: var(--accent); }
+
+  /* ─── SCROLL PROGRESS ─── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--accent); z-index: 9998;
+    width: 0%; transition: width .1s linear;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; width: 100%;
+    height: var(--nav-h); z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    background: rgba(13,13,13,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(232,255,0,.1);
+    transition: background .3s;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 3px;
+    color: var(--white);
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 8px; list-style: none; }
+  .nav-links li a {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 18px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all .25s;
+    position: relative; overflow: hidden;
+  }
+  .nav-links li a::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 50%; width: 0; height: 2px;
+    background: var(--accent);
+    transition: width .3s, left .3s;
+  }
+  .nav-links li a:hover { color: var(--white); border-color: rgba(232,255,0,.3); }
+  .nav-links li a:hover::after { width: 80%; left: 10%; }
+  .nav-links li a.active { color: var(--accent); border-color: rgba(232,255,0,.4); }
+
+  /* ─── PAGES ─── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding-top: var(--nav-h);
+    animation: pageIn .5s cubic-bezier(.22,.68,0,1.2) both;
+  }
+  .page.active { display: block; }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pageOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-20px); }
+  }
+  .page.leaving { animation: pageOut .3s ease both; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: calc(100vh - var(--nav-h));
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 80px 80px 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 80% 50%, rgba(232,255,0,.04), transparent),
+      radial-gradient(ellipse 400px 400px at 20% 80%, rgba(255,77,28,.06), transparent);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .hero-grid svg { width: 100%; height: 100%; opacity: .04; }
+
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 40px; height: 1px; background: var(--accent);
+    animation: expandW 1s .3s both;
+  }
+  @keyframes expandW { from { width: 0; opacity: 0; } to { width: 40px; opacity: 1; } }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 10vw, 140px);
+    line-height: .9;
+    letter-spacing: 2px;
+    color: var(--white);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero h1 .line { display: block; animation: slideUp .7s cubic-bezier(.16,1,.3,1) both; }
+  .hero h1 .line:nth-child(2) { animation-delay: .1s; }
+  .hero h1 .line:nth-child(3) { animation-delay: .2s; }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .hero-desc {
+    max-width: 520px; font-size: 16px; line-height: 1.7;
+    color: var(--muted); margin-bottom: 48px;
+    animation: fadeUp .6s .4s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp .6s .55s both;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: var(--dark);
+    padding: 14px 32px; font-size: 13px;
+    font-family: 'Mulish', sans-serif;
+    font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 4px;
+    transition: all .3s; position: relative; overflow: hidden;
+    text-decoration: none;
+  }
+  .btn-primary::before {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; width: 0; height: 0;
+    background: rgba(0,0,0,.15); border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: width .5s, height .5s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(232,255,0,.25); }
+  .btn-primary:hover::before { width: 300px; height: 300px; }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; color: var(--light);
+    padding: 14px 32px; font-size: 13px;
+    font-family: 'Mulish', sans-serif;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    border: 1px solid rgba(240,240,236,.25); cursor: pointer; border-radius: 4px;
+    transition: all .3s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent); color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 64px;
+    padding-top: 48px; border-top: 1px solid rgba(255,255,255,.06);
+    animation: fadeUp .6s .7s both;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 4px; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; line-height: 1; color: var(--white);
+    counter-reset: cnt 0;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+  .hero-ball {
+    position: absolute; right: 10%; top: 50%; transform: translateY(-50%);
+    width: 340px; height: 340px;
+    animation: float 6s ease-in-out infinite, fadeIn 1s .8s both;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(-50%) rotate(0deg); }
+    50%      { transform: translateY(calc(-50% - 24px)) rotate(15deg); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ─── SECTION COMMONS ─── */
+  section { padding: 100px 80px; }
+  .section-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--accent);
+    background: rgba(232,255,0,.08);
+    padding: 6px 14px; border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  h2.section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 5vw, 72px);
+    line-height: 1; letter-spacing: 1px; color: var(--white);
+    margin-bottom: 48px;
+  }
+  h2.section-title em { color: var(--accent); font-style: normal; }
+  .section-lead {
+    font-size: 17px; line-height: 1.75;
+    color: var(--muted); max-width: 600px; margin-bottom: 56px;
+  }
+
+  /* ─── CARDS ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2px;
+  }
+  /* card styles defined in MAGNETIC CARD section above */
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; line-height: 1;
+    color: rgba(255,255,255,.04);
+    position: absolute; top: 20px; right: 24px;
+    transition: color .3s;
+  }
+  .card:hover .card-num { color: rgba(232,255,0,.08); }
+
+  .card-icon {
+    width: 48px; height: 48px; margin-bottom: 20px;
+    background: rgba(232,255,0,.1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    transition: background .3s, transform .3s;
+  }
+  .card:hover .card-icon { background: rgba(232,255,0,.2); }
+
+  .card h3 {
+    font-size: 18px; font-weight: 700;
+    color: var(--white); margin-bottom: 12px;
+  }
+  .card p {
+    font-size: 14px; line-height: 1.75; color: var(--muted);
+  }
+  .card-tag {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--accent2);
+    background: rgba(255,77,28,.1); padding: 4px 10px; border-radius: 2px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+    margin: 0 80px;
+  }
+
+  /* ─── TWO-COL LAYOUT ─── */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: start;
+  }
+  .two-col.reverse > *:first-child { order: 2; }
+  .two-col.reverse > *:last-child  { order: 1; }
+
+  /* ─── BODY DIAGRAM ─── */
+  .body-diagram-wrap {
+    position: relative; display: flex;
+    justify-content: center; align-items: center;
+  }
+  .body-svg { width: 100%; max-width: 360px; }
+
+  .hotspot {
+    cursor: pointer;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+  .hotspot:hover circle:first-child { r: 14; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .6; }
+  }
+
+  .tooltip-box {
+    position: absolute; pointer-events: none;
+    background: var(--dark3);
+    border: 1px solid rgba(232,255,0,.3);
+    border-radius: 8px; padding: 14px 18px;
+    min-width: 200px; max-width: 260px;
+    opacity: 0; transform: translateY(8px);
+    transition: all .25s;
+    z-index: 10;
+    top: 10px; left: 50%;
+    transform: translateX(-50%) translateY(8px);
+  }
+  .tooltip-box.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .tooltip-box h4 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .tooltip-box p { font-size: 12px; line-height: 1.6; color: var(--muted); }
+
+  /* ─── LIST ─── */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .check-list li {
+    display: flex; gap: 14px; align-items: flex-start;
+    font-size: 15px; line-height: 1.6; color: var(--light);
+    padding: 16px 20px;
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,.04);
+    border-radius: 6px;
+    transition: all .3s;
+  }
+  .check-list li:hover { border-color: rgba(232,255,0,.2); background: var(--dark3); }
+  .check-list li::before {
+    content: '✓';
+    min-width: 22px; height: 22px;
+    background: var(--accent); color: var(--dark);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; margin-top: 2px;
+  }
+
+  /* ─── EXERCISE CARDS ─── */
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .ex-card {
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,.04);
+    border-radius: 8px; overflow: hidden;
+    transition: all .35s;
+  }
+  .ex-card:hover { transform: translateY(-6px); border-color: rgba(232,255,0,.15); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+
+  .ex-card-img {
+    height: 180px; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 64px;
+    position: relative; overflow: hidden;
+  }
+  .ex-card-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 60%, var(--dark2) 100%);
+  }
+  .ex-card-body { padding: 24px; }
+  .ex-card-body h3 { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .ex-card-body p { font-size: 13px; line-height: 1.65; color: var(--muted); margin-bottom: 16px; }
+  .ex-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+  }
+  .badge.level-easy  { background: rgba(100,220,100,.1); color: #64DC64; }
+  .badge.level-med   { background: rgba(255,200,50,.1);  color: #FFC832; }
+  .badge.level-hard  { background: rgba(255,77,28,.1);   color: var(--accent2); }
+  .badge.zone        { background: rgba(232,255,0,.08);  color: var(--accent); }
+
+  /* ─── TIMELINE ─── */
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 8px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, var(--accent), rgba(232,255,0,.1));
+  }
+  .tl-item {
+    position: relative; margin-bottom: 40px;
+    padding: 24px 28px;
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,.04);
+    border-radius: 8px;
+    transition: all .3s;
+  }
+  .tl-item:hover { border-color: rgba(232,255,0,.15); transform: translateX(6px); }
+  .tl-dot {
+    position: absolute; left: -44px; top: 28px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--dark);
+    transition: transform .3s;
+  }
+  .tl-item:hover .tl-dot { transform: scale(1.3); }
+  .tl-time { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .tl-item h3 { font-size: 17px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .tl-item p { font-size: 14px; line-height: 1.7; color: var(--muted); }
+
+  /* ─── ACCORDION ─── */
+  .accordion { display: flex; flex-direction: column; gap: 4px; }
+  .acc-item {
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,.04);
+    border-radius: 6px; overflow: hidden;
+    transition: border-color .3s;
+  }
+  .acc-item.open { border-color: rgba(232,255,0,.2); }
+  .acc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px; cursor: pointer;
+    font-size: 15px; font-weight: 600; color: var(--white);
+    transition: color .3s;
+  }
+  .acc-header:hover { color: var(--accent); }
+  .acc-arrow {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(232,255,0,.1); border-radius: 4px;
+    font-size: 14px; color: var(--accent);
+    transition: transform .3s;
+    flex-shrink: 0;
+  }
+  .acc-item.open .acc-arrow { transform: rotate(45deg); }
+  .acc-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1);
+  }
+  .acc-body-inner { padding: 0 24px 20px; font-size: 14px; line-height: 1.8; color: var(--muted); }
+
+  /* ─── CTA BANNER ─── */
+  .cta-banner {
+    background: var(--accent);
+    padding: 80px; display: flex;
+    align-items: center; justify-content: space-between;
+    gap: 40px; flex-wrap: wrap;
+  }
+  .cta-banner h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 4vw, 60px);
+    color: var(--dark); line-height: 1;
+  }
+  .cta-banner p { font-size: 15px; color: rgba(0,0,0,.6); margin-top: 8px; }
+  .btn-dark {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--dark); color: var(--white);
+    padding: 16px 36px; font-size: 13px; font-family: 'Mulish', sans-serif;
+    font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 4px;
+    transition: all .3s; flex-shrink: 0;
+    text-decoration: none;
+  }
+  .btn-dark:hover { background: var(--dark3); transform: scale(1.04); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--dark2);
+    border-top: 1px solid rgba(255,255,255,.05);
+    padding: 60px 80px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+  }
+  footer .logo { font-size: 22px; }
+  .foot-copy { font-size: 13px; color: var(--muted); }
+  .foot-links { display: flex; gap: 24px; }
+  .foot-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
+  .foot-links a:hover { color: var(--accent); }
+
+  /* ─── ALERT BOX ─── */
+  .alert {
+    background: rgba(255,77,28,.08);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px; margin-bottom: 24px;
+    font-size: 14px; line-height: 1.7; color: var(--light);
+  }
+  .alert strong { color: var(--accent2); }
+
+  /* ─── SEVERITY ─── */
+  .severity-bar {
+    display: flex; height: 8px; border-radius: 4px;
+    overflow: hidden; margin-top: 12px;
+    background: rgba(255,255,255,.06);
+  }
+  .severity-fill {
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(.22,.68,0,1.2);
+  }
+
+  /* ─── RISK CALCULATOR ─── */
+  .risk-q { margin-bottom: 26px; }
+  .risk-q-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+  .risk-q-label span { color: var(--accent); }
+  .risk-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .risk-opt {
+    background: var(--dark2); border: 1px solid rgba(255,255,255,.08);
+    color: var(--light); font-family: 'Mulish', sans-serif;
+    font-size: 12.5px; font-weight: 700;
+    padding: 10px 16px; border-radius: 6px;
+    cursor: pointer; transition: all .2s;
+  }
+  .risk-opt:hover { border-color: rgba(232,255,0,.3); background: var(--dark3); }
+  .risk-opt.selected { background: var(--accent); color: var(--dark); border-color: var(--accent); }
+  .risk-result-card {
+    background: var(--dark2); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px; padding: 32px; min-height: 100%;
+  }
+  .risk-score-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
+  .risk-score-num { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; }
+  .risk-score-label {
+    font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 3px;
+  }
+  .risk-rec-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+  .risk-rec-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 13.5px; line-height: 1.65; color: var(--muted);
+    padding: 14px 16px; background: var(--dark3);
+    border-radius: 6px; border: 1px solid rgba(255,255,255,.04);
+  }
+  .risk-rec-list li::before { content: '▸'; color: var(--accent); font-weight: 800; flex-shrink: 0; }
+
+  /* ─── LAZY VIDEO EMBED ─── */
+  .video-embed {
+    cursor: pointer; overflow: hidden; position: relative;
+    background: radial-gradient(circle at 50% 45%, var(--dark3) 0%, var(--dark2) 70%);
+    transition: background .4s;
+  }
+  .video-embed-icon {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; opacity: .12;
+    transition: opacity .4s, transform .4s;
+  }
+  .video-embed:hover .video-embed-icon { opacity: .2; transform: scale(1.08); }
+  .video-play-btn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 28px rgba(232,255,0,.35);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .video-embed:hover .video-play-btn { transform: translate(-50%,-50%) scale(1.1); box-shadow: 0 10px 36px rgba(232,255,0,.5); }
+  .video-play-btn svg { width: 22px; height: 22px; fill: var(--dark); margin-left: 2px; }
+
+  /* ─── MAGNETIC CARD ─── */
+  .card {
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,.04);
+    padding: 40px 36px;
+    transition: border-color .35s, background .35s;
+    position: relative; overflow: hidden;
+    cursor: default;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; width: 100%; height: 3px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .4s ease;
+  }
+  .card:hover { background: var(--dark3); border-color: rgba(232,255,0,.12); }
+  .card:hover::before { transform: scaleX(1); }
+  .card-shine {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(232,255,0,.08) 0%, transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .card:hover .card-shine { opacity: 1; }
+
+  /* ─── SCOREBOARD counter ─── */
+  .scoreboard-digit {
+    display: inline-block;
+    font-family: 'Bebas Neue', monospace;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* ─── PARTICLE TRAIL (canvas handles it) ─── */
+
+
+
+  /* ─── RESPONSIVE TWEAKS ─── */
+  @media (max-width: 900px) {
+    section { padding: 60px 24px; }
+    .hero { padding: 60px 24px 40px; }
+    nav { padding: 0 24px; }
+    .hero-ball { display: none; }
+    .two-col { grid-template-columns: 1fr; gap: 40px; }
+    .two-col.reverse > *:first-child { order: 1; }
+    .two-col.reverse > *:last-child  { order: 2; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; }
+    .cta-banner { padding: 40px 24px; }
+    footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+    .divider { margin: 0 24px; }
+    .nav-links li a { padding: 6px 10px; font-size: 10px; }
+  }
+
+  /* ─── REVEAL ANIMATION ─── */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;"></canvas>
+<div class="cursor" id="cursor"></div>
+<div id="progress-bar"></div>
+
+<!-- ═══════════════════════ NAV ═══════════════════════ -->
+<nav>
+  <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home',this)" class="active">⬤ Главная</a></li>
+    <li><a href="#" onclick="showPage('injuries',this)">⚡ Травмы</a></li>
+    <li><a href="#" onclick="showPage('prevention',this)">🛡 Профилактика</a></li>
+    <li><a href="#" onclick="showPage('exercises',this)">💪 Упражнения</a></li>
+    <li><a href="#" onclick="showPage('firstaid',this)">❤ Первая помощь</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 1: HOME
+═══════════════════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <!-- Parallax court grid -->
+    <div id="court-parallax" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;">
+      <svg id="court-svg" viewBox="0 0 1200 700" preserveAspectRatio="none" style="width:120%;height:120%;position:absolute;top:-10%;left:-10%;opacity:.07;">
+        <!-- Court boundary -->
+        <rect x="100" y="80" width="1000" height="540" fill="none" stroke="#E8FF00" stroke-width="2"/>
+        <!-- Center line -->
+        <line x1="600" y1="80" x2="600" y2="620" stroke="#E8FF00" stroke-width="2.5"/>
+        <!-- Net line -->
+        <line x1="600" y1="80" x2="600" y2="620" stroke="#FF4D1C" stroke-width="4" stroke-dasharray="8 4"/>
+        <!-- Attack lines -->
+        <line x1="100" y1="260" x2="600" y2="260" stroke="#E8FF00" stroke-width="1.5"/>
+        <line x1="600" y1="260" x2="1100" y2="260" stroke="#E8FF00" stroke-width="1.5"/>
+        <line x1="100" y1="440" x2="600" y2="440" stroke="#E8FF00" stroke-width="1.5"/>
+        <line x1="600" y1="440" x2="1100" y2="440" stroke="#E8FF00" stroke-width="1.5"/>
+        <!-- Service zones -->
+        <line x1="100" y1="80" x2="100" y2="620" stroke="#E8FF00" stroke-width="1.5"/>
+        <line x1="1100" y1="80" x2="1100" y2="620" stroke="#E8FF00" stroke-width="1.5"/>
+        <!-- Center circles -->
+        <circle cx="600" cy="350" r="60" fill="none" stroke="#E8FF00" stroke-width="1.5"/>
+        <!-- Corner marks -->
+        <circle cx="100" cy="80" r="4" fill="#E8FF00"/>
+        <circle cx="1100" cy="80" r="4" fill="#E8FF00"/>
+        <circle cx="100" cy="620" r="4" fill="#E8FF00"/>
+        <circle cx="1100" cy="620" r="4" fill="#E8FF00"/>
+      </svg>
+    </div>
+    <div class="hero-grid">
+      <svg viewBox="0 0 1200 700" preserveAspectRatio="none">
+        <defs><pattern id="gr" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M60 0L0 0 0 60" fill="none" stroke="white" stroke-width=".5"/>
+        </pattern></defs>
+        <rect width="1200" height="700" fill="url(#gr)"/>
+      </svg>
+    </div>
+
+    <!-- Three.js 3D Volleyball -->
+    <div class="hero-ball" id="hero-ball-wrap">
+      <canvas id="ball-canvas" style="width:340px;height:340px;display:block;"></canvas>
+    </div>
+
+    <div class="hero-eyebrow">Волейбол и безопасность</div>
+    <h1>
+      <span class="line">ЗАЩИТИ</span>
+      <span class="line">СВОЁ <em>ТЕЛО</em></span>
+      <span class="line">ИГРАЙ СИЛЬНО</span>
+    </h1>
+    <p class="hero-desc">
+      Полное руководство по профилактике волейбольных травм. Знай риски, тренируйся правильно и возвращайся на площадку быстрее.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('injuries', document.querySelector('.nav-links a:nth-child(2)'))">
+        Узнать о травмах →
+      </button>
+      <button class="btn-secondary" onclick="showPage('exercises', document.querySelector('.nav-links a:nth-child(4)'))">
+        Упражнения
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num"><span class="counter" data-target="73">0</span><span>%</span></div>
+        <div class="stat-label">Травм можно предотвратить</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num"><span class="counter" data-target="20">0</span><span>+</span></div>
+        <div class="stat-label">Упражнений с видео</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num"><span class="counter" data-target="15">0</span><span> мин</span></div>
+        <div class="stat-label">Ежедневная разминка</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="section-tag">Почему это важно</div>
+    <h2 class="section-title">Волейбол — <em>динамичный</em> спорт с реальными рисками</h2>
+    <div class="cards-grid">
+      <div class="card reveal">
+        <div class="card-num">01</div>
+        <div class="card-icon">🦵</div>
+        <h3>Прыжковые нагрузки</h3>
+        <p>Каждый прыжок создаёт нагрузку, в 3–5 раз превышающую вес тела. За игру игрок совершает до 50–80 прыжков.</p>
+        <div class="card-tag">Высокий риск</div>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="card-num">02</div>
+        <div class="card-icon">🤚</div>
+        <h3>Контакт с мячом</h3>
+        <p>Неправильная постановка рук при приёме или блоке — главная причина травм запястий и пальцев.</p>
+        <div class="card-tag">Средний риск</div>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="card-num">03</div>
+        <div class="card-icon">🔄</div>
+        <h3>Резкие движения</h3>
+        <p>Ускорения, смена направления и развороты в защите создают нагрузку на колени и лодыжки.</p>
+        <div class="card-tag">Высокий риск</div>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div class="card-num">04</div>
+        <div class="card-icon">🏐</div>
+        <h3>Удары при подаче</h3>
+        <p>Подача в прыжке создаёт значительную нагрузку на плечевой сустав и ротаторную манжету.</p>
+        <div class="card-tag">Средний риск</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-banner">
+    <div>
+      <h2>ГОТОВ ЗАЩИТИТЬ СВОЁ ЗДОРОВЬЕ?</h2>
+      <p>Изучи полное руководство и начни тренироваться безопаснее уже сегодня</p>
+    </div>
+    <button class="btn-dark" onclick="showPage('prevention', document.querySelector('.nav-links a:nth-child(3)'))">
+      Начать программу →
+    </button>
+  </div>
+
+  <footer>
+    <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+    <div class="foot-copy">© 2024 VolleyGuard — Спортивная медицина и профилактика</div>
+    <div class="foot-links">
+      <a href="#" onclick="showPage('injuries',null)">Травмы</a>
+      <a href="#" onclick="showPage('prevention',null)">Профилактика</a>
+      <a href="#" onclick="showPage('exercises',null)">Упражнения</a>
+      <a href="#" onclick="showPage('firstaid',null)">Первая помощь</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 2: INJURIES
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-injuries">
+  <section>
+    <div class="section-tag">Типичные травмы</div>
+    <h2 class="section-title"><em>Уязвимые</em> зоны волейболиста</h2>
+    <p class="section-lead">Наведи на область тела, чтобы узнать подробнее о возможных травмах в этой зоне.</p>
+
+    <div class="two-col">
+      <div class="body-diagram-wrap" style="position:relative;">
+        <svg class="body-svg" viewBox="0 0 280 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Body silhouette -->
+          <ellipse cx="140" cy="52" rx="36" ry="40" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <!-- Neck -->
+          <rect x="128" y="90" width="24" height="28" rx="4" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.1)"/>
+          <!-- Torso -->
+          <path d="M80 118 L82 260 L200 260 L198 118 Q168 110 140 112 Q112 110 80 118Z"
+                fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+          <!-- Left arm -->
+          <path d="M80 125 L58 210 L68 310 L82 308 L76 212 L92 130Z"
+                fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+          <!-- Right arm -->
+          <path d="M200 125 L222 210 L212 310 L198 308 L204 212 L188 130Z"
+                fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+          <!-- Left leg -->
+          <path d="M102 258 L96 370 L108 470 L128 468 L120 370 L118 260Z"
+                fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+          <!-- Right leg -->
+          <path d="M178 258 L184 370 L172 470 L152 468 L160 370 L162 260Z"
+                fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+
+          <!-- HOTSPOTS -->
+          <!-- Shoulder -->
+          <g class="hotspot" data-zone="shoulder" onclick="showZone('shoulder')">
+            <circle cx="76" cy="130" r="18" fill="rgba(255,77,28,.15)" stroke="rgba(255,77,28,.6)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="76" cy="130" r="8" fill="rgba(255,77,28,.4)"/>
+            <text x="76" y="135" text-anchor="middle" fill="white" font-size="10" font-family="Mulish" font-weight="700">!</text>
+          </g>
+          <g class="hotspot" data-zone="shoulder" onclick="showZone('shoulder')">
+            <circle cx="204" cy="130" r="18" fill="rgba(255,77,28,.15)" stroke="rgba(255,77,28,.6)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="204" cy="130" r="8" fill="rgba(255,77,28,.4)"/>
+            <text x="204" y="135" text-anchor="middle" fill="white" font-size="10" font-family="Mulish" font-weight="700">!</text>
+          </g>
+          <!-- Wrist -->
+          <g class="hotspot" data-zone="wrist" onclick="showZone('wrist')">
+            <circle cx="64" cy="305" r="16" fill="rgba(232,255,0,.12)" stroke="rgba(232,255,0,.5)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="64" cy="305" r="7" fill="rgba(232,255,0,.4)"/>
+            <text x="64" y="310" text-anchor="middle" fill="#0D0D0D" font-size="9" font-family="Mulish" font-weight="800">!</text>
+          </g>
+          <g class="hotspot" data-zone="wrist" onclick="showZone('wrist')">
+            <circle cx="216" cy="305" r="16" fill="rgba(232,255,0,.12)" stroke="rgba(232,255,0,.5)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="216" cy="305" r="7" fill="rgba(232,255,0,.4)"/>
+            <text x="216" y="310" text-anchor="middle" fill="#0D0D0D" font-size="9" font-family="Mulish" font-weight="800">!</text>
+          </g>
+          <!-- Knee -->
+          <g class="hotspot" data-zone="knee" onclick="showZone('knee')">
+            <circle cx="106" cy="370" r="18" fill="rgba(255,77,28,.15)" stroke="rgba(255,77,28,.6)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="106" cy="370" r="8" fill="rgba(255,77,28,.4)"/>
+            <text x="106" y="375" text-anchor="middle" fill="white" font-size="10" font-family="Mulish" font-weight="700">!</text>
+          </g>
+          <g class="hotspot" data-zone="knee" onclick="showZone('knee')">
+            <circle cx="174" cy="370" r="18" fill="rgba(255,77,28,.15)" stroke="rgba(255,77,28,.6)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="174" cy="370" r="8" fill="rgba(255,77,28,.4)"/>
+            <text x="174" y="375" text-anchor="middle" fill="white" font-size="10" font-family="Mulish" font-weight="700">!</text>
+          </g>
+          <!-- Ankle -->
+          <g class="hotspot" data-zone="ankle" onclick="showZone('ankle')">
+            <circle cx="114" cy="450" r="16" fill="rgba(232,255,0,.12)" stroke="rgba(232,255,0,.5)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="114" cy="450" r="7" fill="rgba(232,255,0,.4)"/>
+            <text x="114" y="455" text-anchor="middle" fill="#0D0D0D" font-size="9" font-family="Mulish" font-weight="800">!</text>
+          </g>
+          <g class="hotspot" data-zone="ankle" onclick="showZone('ankle')">
+            <circle cx="166" cy="450" r="16" fill="rgba(232,255,0,.12)" stroke="rgba(232,255,0,.5)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="166" cy="450" r="7" fill="rgba(232,255,0,.4)"/>
+            <text x="166" y="455" text-anchor="middle" fill="#0D0D0D" font-size="9" font-family="Mulish" font-weight="800">!</text>
+          </g>
+          <!-- Finger -->
+          <g class="hotspot" data-zone="finger" onclick="showZone('finger')">
+            <circle cx="70" cy="330" r="12" fill="rgba(150,100,255,.15)" stroke="rgba(180,140,255,.5)" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <circle cx="70" cy="330" r="5" fill="rgba(180,140,255,.5)"/>
+          </g>
+          <!-- Lower back -->
+          <g class="hotspot" data-zone="back" onclick="showZone('back')">
+            <circle cx="140" cy="220" r="20" fill="rgba(255,160,0,.1)" stroke="rgba(255,160,0,.4)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <circle cx="140" cy="220" r="9" fill="rgba(255,160,0,.35)"/>
+            <text x="140" y="225" text-anchor="middle" fill="white" font-size="10" font-family="Mulish" font-weight="700">!</text>
+          </g>
+        </svg>
+
+        <div class="tooltip-box" id="zone-tooltip">
+          <h4 id="tooltip-title">–</h4>
+          <p id="tooltip-body">–</p>
+        </div>
+      </div>
+
+      <div>
+        <div id="zone-details">
+          <div class="alert">
+            <strong>⚠ Нажми на точку</strong> на схеме, чтобы увидеть подробную информацию о травме и степени риска.
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <div class="section-tag" style="margin-bottom:16px;">Статистика травматизма</div>
+          <div style="display:flex;flex-direction:column;gap:14px;" id="injury-bars">
+            <div class="reveal">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--light)">Голеностопный сустав</span>
+                <span style="color:var(--accent);font-weight:700">42%</span>
+              </div>
+              <div class="severity-bar"><div class="severity-fill" data-w="42" style="width:0%;background:var(--accent2)"></div></div>
+            </div>
+            <div class="reveal reveal-delay-1">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--light)">Колено (сухожилие)</span>
+                <span style="color:var(--accent);font-weight:700">28%</span>
+              </div>
+              <div class="severity-bar"><div class="severity-fill" data-w="28" style="width:0%;background:var(--accent2)"></div></div>
+            </div>
+            <div class="reveal reveal-delay-2">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--light)">Пальцы рук</span>
+                <span style="color:var(--accent);font-weight:700">16%</span>
+              </div>
+              <div class="severity-bar"><div class="severity-fill" data-w="16" style="width:0%;background:var(--accent)"></div></div>
+            </div>
+            <div class="reveal reveal-delay-3">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--light)">Плечо / ротаторная манжета</span>
+                <span style="color:var(--accent);font-weight:700">9%</span>
+              </div>
+              <div class="severity-bar"><div class="severity-fill" data-w="9" style="width:0%;background:#A080FF"></div></div>
+            </div>
+            <div class="reveal reveal-delay-4">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--light)">Поясница</span>
+                <span style="color:var(--accent);font-weight:700">5%</span>
+              </div>
+              <div class="severity-bar"><div class="severity-fill" data-w="5" style="width:0%;background:#FFB030"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="section-tag">Детальный разбор</div>
+    <h2 class="section-title">Самые <em>частые</em> травмы</h2>
+    <div class="accordion" id="injury-accordion">
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>🦵 Растяжение связок голеностопа</span>
+          <div class="acc-arrow">+</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            <strong style="color:var(--light)">Механизм:</strong> Происходит при приземлении на ногу другого игрока или на неровной поверхности. Инверсионная травма (подворот стопы внутрь) — наиболее распространённый вид.<br><br>
+            <strong style="color:var(--light)">Симптомы:</strong> Боль по наружной поверхности лодыжки, отёк, синяк, ограничение движений, нестабильность при ходьбе.<br><br>
+            <strong style="color:var(--light)">Степени:</strong> I (микроразрыв) — 1–2 недели; II (частичный разрыв) — 3–6 недель; III (полный разрыв) — 2–6 месяцев.<br><br>
+            <strong style="color:var(--accent2)">⚠ Важно:</strong> Не игнорируй «простое» растяжение — повторные травмы приводят к хронической нестабильности.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>🦴 «Прыгунковое колено» (тендинопатия надколенника)</span>
+          <div class="acc-arrow">+</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            <strong style="color:var(--light)">Механизм:</strong> Хроническая перегрузка сухожилия надколенника из-за многократных прыжков и резких приземлений. Накопительная травма — развивается постепенно.<br><br>
+            <strong style="color:var(--light)">Симптомы:</strong> Боль ниже надколенника, усиливающаяся при прыжках, беге по лестнице и после тренировки. На ранних стадиях боль проходит «в разминке».<br><br>
+            <strong style="color:var(--light)">Лечение:</strong> Эксцентрические упражнения — золотой стандарт. Снижение нагрузки + физиотерапия. В тяжёлых случаях — PRP-инъекции или операция.<br><br>
+            <strong style="color:var(--accent2)">⚠ Важно:</strong> При игнорировании ведёт к разрыву сухожилия, требующему длительной операции.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>🤚 Травмы пальцев (разрывы сухожилий, переломы)</span>
+          <div class="acc-arrow">+</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            <strong style="color:var(--light)">Механизм:</strong> Прямой удар мяча по вытянутому пальцу, особенно при блоке или неудачном пасе. Типичные травмы: разрыв коллатеральных связок, молоткообразный палец, перелом.<br><br>
+            <strong style="color:var(--light)">Симптомы:</strong> Боль, отёк, деформация пальца, невозможность разогнуть или согнуть.<br><br>
+            <strong style="color:var(--light)">Первая помощь:</strong> Шинирование к соседнему пальцу (buddy taping), лёд, возвышенное положение руки.<br><br>
+            <strong style="color:var(--accent)">💡 Совет:</strong> Тейпирование пальцев перед игрой — эффективная профилактика.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>💪 Ротаторная манжета и импинджмент плеча</span>
+          <div class="acc-arrow">+</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            <strong style="color:var(--light)">Механизм:</strong> Повторяющиеся движения над головой при подаче, блоке и атаке создают микроповреждения манжеты ротаторов. Особенно страдают нападающие и подающие.<br><br>
+            <strong style="color:var(--light)">Симптомы:</strong> Боль при поднятии руки выше 90°, ночные боли, слабость, щелчки в суставе.<br><br>
+            <strong style="color:var(--light)">Профилактика:</strong> Укрепление внешних ротаторов, растяжка задней капсулы (sleeper stretch), правильная техника подачи.<br><br>
+            <strong style="color:var(--accent2)">⚠ Важно:</strong> Хронический импинджмент ведёт к разрыву манжеты — требует артроскопической операции.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span>🦴 Стрессовые переломы (усталостные)</span>
+          <div class="acc-arrow">+</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            <strong style="color:var(--light)">Механизм:</strong> Накопленная микротравматизация кости при интенсивных тренировках без достаточного восстановления. Типичные места: берцовые кости, плюсневые кости стоп, позвонки.<br><br>
+            <strong style="color:var(--light)">Симптомы:</strong> Нарастающая локализованная боль при нагрузке, проходящая в покое; болезненность при пальпации; на МРТ — зона отёка.<br><br>
+            <strong style="color:var(--light)">Лечение:</strong> Полный покой 6–12 недель, иммобилизация, кальций + витамин D, проверка питания.<br><br>
+            <strong style="color:var(--accent)">💡 Совет:</strong> Стрессовые переломы чаще встречаются у спортсменов с дефицитом калорий (особенно у девушек — триада спортсменки).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+    <div class="foot-copy">© 2024 VolleyGuard — Спортивная медицина и профилактика</div>
+    <div class="foot-links">
+      <a href="#" onclick="showPage('prevention',null)">Профилактика →</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 3: PREVENTION
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-prevention">
+  <section>
+    <div class="section-tag">Профилактика</div>
+    <h2 class="section-title">Система <em>защиты</em> от травм</h2>
+    <p class="section-lead">Комплексный подход, который доказано снижает риск травм на 73%.</p>
+
+    <div class="two-col">
+      <div>
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-dot"></div>
+            <div class="tl-time">До тренировки</div>
+            <h3>Разминка и активация</h3>
+            <p>Динамическая разминка 10–15 минут: суставная гимнастика, лёгкий бег с изменением темпа, прыжки в невысоком темпе. Активируй мышцы кора и стабилизаторы.</p>
+          </div>
+          <div class="tl-item reveal reveal-delay-1">
+            <div class="tl-dot"></div>
+            <div class="tl-time">В начале тренировки</div>
+            <h3>Специальная разминка</h3>
+            <p>Упражнения, имитирующие игровые движения: пасы у стены, прыжки с взмахом рук, выпады в направлении мяча. Скорость нарастает постепенно.</p>
+          </div>
+          <div class="tl-item reveal reveal-delay-2">
+            <div class="tl-dot"></div>
+            <div class="tl-time">Во время игры</div>
+            <h3>Контроль техники</h3>
+            <p>Правильное приземление (мягкий перекат через стопу), постановка рук при блоке, положение спины при подаче — эти технические элементы напрямую влияют на безопасность.</p>
+          </div>
+          <div class="tl-item reveal reveal-delay-3">
+            <div class="tl-dot"></div>
+            <div class="tl-time">После тренировки</div>
+            <h3>Заминка и восстановление</h3>
+            <p>Статическая растяжка 10–15 минут: акцент на квадрицепс, икры, плечи и поясницу. Холодный душ, питание в течение 45 минут (белок + углеводы).</p>
+          </div>
+          <div class="tl-item reveal reveal-delay-4">
+            <div class="tl-dot"></div>
+            <div class="tl-time">Каждую неделю</div>
+            <h3>Силовая работа</h3>
+            <p>2–3 силовые тренировки с акцентом на ноги, кор и плечевой пояс. Эксцентрические упражнения для профилактики сухожильных травм.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="margin-bottom:40px;">
+          <div class="section-tag" style="margin-bottom:20px;">Правила безопасности</div>
+          <ul class="check-list">
+            <li class="reveal">Никогда не пропускай разминку, даже на «простую» тренировку</li>
+            <li class="reveal reveal-delay-1">Используй правильную обувь с боковой поддержкой и амортизацией</li>
+            <li class="reveal reveal-delay-2">Тейпируй пальцы рук перед игрой при наличии нестабильности</li>
+            <li class="reveal reveal-delay-3">Надевай наколенники при наличии хронических болей в суставах</li>
+            <li class="reveal reveal-delay-4">Сообщай тренеру о любой боли — играть через боль опасно</li>
+            <li class="reveal">Следи за покрытием площадки и отсутствием посторонних предметов</li>
+            <li class="reveal reveal-delay-1">Соблюдай режим сна: 8 часов минимум в период интенсивных тренировок</li>
+          </ul>
+        </div>
+
+        <div style="background:var(--dark2);border:1px solid rgba(232,255,0,.15);border-radius:8px;padding:28px;">
+          <div class="section-tag" style="margin-bottom:16px;">Экипировка</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:var(--dark3);border-radius:6px;padding:16px;text-align:center;transition:transform .3s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="font-size:28px;margin-bottom:8px;">👟</div>
+              <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">Обувь</div>
+              <div style="font-size:11px;color:var(--muted)">Волейбольные кроссовки с гелевой подошвой</div>
+            </div>
+            <div style="background:var(--dark3);border-radius:6px;padding:16px;text-align:center;transition:transform .3s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="font-size:28px;margin-bottom:8px;">🦵</div>
+              <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">Наколенники</div>
+              <div style="font-size:11px;color:var(--muted)">Защита при игре в защите (libero)</div>
+            </div>
+            <div style="background:var(--dark3);border-radius:6px;padding:16px;text-align:center;transition:transform .3s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="font-size:28px;margin-bottom:8px;">🩹</div>
+              <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">Тейп</div>
+              <div style="font-size:11px;color:var(--muted)">Кинезио и жёсткий атлетический тейп</div>
+            </div>
+            <div style="background:var(--dark3);border-radius:6px;padding:16px;text-align:center;transition:transform .3s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="font-size:28px;margin-bottom:8px;">💊</div>
+              <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">Аптечка</div>
+              <div style="font-size:11px;color:var(--muted)">Эластичный бинт, холодные пакеты, бинт</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section style="padding-top:0;">
+    <div class="section-tag">Персональная оценка</div>
+    <h2 class="section-title">Калькулятор <em>риска травм</em></h2>
+    <p class="section-lead">5 вопросов о позиции, нагрузке и привычках — получи риск-профиль и точечные рекомендации, основанные на твоих ответах.</p>
+
+    <div class="two-col">
+      <div>
+        <div class="risk-q">
+          <div class="risk-q-label"><span>1.</span> Игровая позиция</div>
+          <div class="risk-opts" data-q="position">
+            <button class="risk-opt" data-w="78" onclick="selectRiskOpt(this)">Доигровщик</button>
+            <button class="risk-opt" data-w="80" onclick="selectRiskOpt(this)">Диагональный</button>
+            <button class="risk-opt" data-w="55" onclick="selectRiskOpt(this)">Связующий</button>
+            <button class="risk-opt" data-w="82" onclick="selectRiskOpt(this)">Центральный блокирующий</button>
+            <button class="risk-opt" data-w="60" onclick="selectRiskOpt(this)">Либеро</button>
+          </div>
+        </div>
+        <div class="risk-q">
+          <div class="risk-q-label"><span>2.</span> Тренировок в неделю</div>
+          <div class="risk-opts" data-q="freq">
+            <button class="risk-opt" data-w="20" onclick="selectRiskOpt(this)">1–2</button>
+            <button class="risk-opt" data-w="50" onclick="selectRiskOpt(this)">3–4</button>
+            <button class="risk-opt" data-w="80" onclick="selectRiskOpt(this)">5+</button>
+          </div>
+        </div>
+        <div class="risk-q">
+          <div class="risk-q-label"><span>3.</span> Разминка перед тренировкой</div>
+          <div class="risk-opts" data-q="warmup">
+            <button class="risk-opt" data-w="10" onclick="selectRiskOpt(this)">Всегда полная</button>
+            <button class="risk-opt" data-w="50" onclick="selectRiskOpt(this)">Иногда / частично</button>
+            <button class="risk-opt" data-w="90" onclick="selectRiskOpt(this)">Редко или никогда</button>
+          </div>
+        </div>
+        <div class="risk-q">
+          <div class="risk-q-label"><span>4.</span> Травмы за последний год</div>
+          <div class="risk-opts" data-q="history">
+            <button class="risk-opt" data-w="15" data-zone="" onclick="selectRiskOpt(this)">Не было</button>
+            <button class="risk-opt" data-w="65" data-zone="голеностопа или колена" onclick="selectRiskOpt(this)">Голеностоп / колено</button>
+            <button class="risk-opt" data-w="65" data-zone="плеча или спины" onclick="selectRiskOpt(this)">Плечо / спина</button>
+            <button class="risk-opt" data-w="90" data-zone="нескольких зон" onclick="selectRiskOpt(this)">Несколько травм</button>
+          </div>
+        </div>
+        <div class="risk-q">
+          <div class="risk-q-label"><span>5.</span> Защитная экипировка (наколенники, тейп)</div>
+          <div class="risk-opts" data-q="gear">
+            <button class="risk-opt" data-w="15" onclick="selectRiskOpt(this)">Использую всегда</button>
+            <button class="risk-opt" data-w="50" onclick="selectRiskOpt(this)">Иногда</button>
+            <button class="risk-opt" data-w="80" onclick="selectRiskOpt(this)">Не использую</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="calcRisk()">Рассчитать риск →</button>
+      </div>
+
+      <div>
+        <div class="risk-result-card" id="risk-result">
+          <div class="alert" style="margin-bottom:0;">
+            <strong>⚡ Ответь на вопросы слева</strong> — после расчёта здесь появится твой риск-профиль и персональные рекомендации по тренировкам и защите.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:var(--dark2);padding:80px;margin:0;">
+    <div class="section-tag" style="margin-bottom:20px;">Программа VolleyGuard</div>
+    <h2 class="section-title" style="margin-bottom:40px;">Разминка <em>FIFA 11+</em> для волейбола</h2>
+    <p class="section-lead" style="margin-bottom:48px;">Адаптированная программа нейромышечного тренинга. Выполняется каждый раз перед тренировкой — 15–20 минут.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px;">
+      <div class="card reveal" style="border-left:3px solid var(--accent)">
+        <div style="font-size:32px;margin-bottom:12px;">🚶</div>
+        <h3>1. Бег с захлёстом</h3>
+        <p>2 × 20 м. Пятка к ягодице. Активирует бедра и икры.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div style="font-size:32px;margin-bottom:12px;">🦵</div>
+        <h3>2. Ходьба с высоким коленом</h3>
+        <p>2 × 20 м. Корпус прямой, пресс включён.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div style="font-size:32px;margin-bottom:12px;">🏃</div>
+        <h3>3. Боковые приставные шаги</h3>
+        <p>2 × 30 сек. Приседание на опорной ноге. Имитация защитной стойки.</p>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div style="font-size:32px;margin-bottom:12px;">🤸</div>
+        <h3>4. Выпады с вращением</h3>
+        <p>2 × 10 с каждой ногой. Грудной отдел позвоночника.</p>
+      </div>
+      <div class="card reveal">
+        <div style="font-size:32px;margin-bottom:12px;">⬆️</div>
+        <h3>5. Прыжки на одной ноге</h3>
+        <p>3 × 10 повт. Мягкое приземление на согнутую ногу.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div style="font-size:32px;margin-bottom:12px;">💪</div>
+        <h3>6. Планка с ротацией</h3>
+        <p>2 × 30 сек. Стабилизация кора и плечевого пояса.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+    <div class="foot-copy">© 2024 VolleyGuard — Спортивная медицина и профилактика</div>
+    <div class="foot-links">
+      <a href="#" onclick="showPage('exercises',null)">Упражнения →</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 4: EXERCISES
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-exercises">
+  <section>
+    <div class="section-tag">Упражнения</div>
+    <h2 class="section-title">Тренируйся <em>правильно</em></h2>
+    <p class="section-lead">Видеоуроки от профессионалов, 20+ упражнений и недельная программа для волейболиста.</p>
+
+    <!-- VIDEO SECTION -->
+    <div style="margin-bottom:72px;">
+      <div class="section-tag" style="margin-bottom:20px;">Видеоуроки</div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3vw,44px);color:var(--white);margin-bottom:12px;">Смотри и <em style="color:var(--accent);font-style:normal;">повторяй</em></h3>
+      <p style="font-size:15px;color:var(--muted);margin-bottom:36px;max-width:560px;">Подборка видеоинструкций от профессиональных тренеров и физиотерапевтов по ключевым упражнениям.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;">
+
+        <!-- VIDEO 1: Ankle stability -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="xbRAuSNZqmc" data-title="Укрепление голеностопа для волейболистов" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">🦶</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge zone">Голеностоп</span>
+              <span class="badge level-easy">Начальный</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Стабилизация голеностопа</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Комплекс упражнений для предотвращения подворота лодыжки — самой частой травмы в волейболе.</p>
+          </div>
+        </div>
+
+        <!-- VIDEO 2: Knee exercises -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="W_F-CcKFWFY" data-title="Профилактика травм колена у волейболистов" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">🦵</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge zone">Колено</span>
+              <span class="badge level-med">Средний</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Колено прыгуна: профилактика</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Эксцентрические упражнения и техника правильного приземления после прыжков.</p>
+          </div>
+        </div>
+
+        <!-- VIDEO 3: Shoulder mobility -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="H-VVYnLPyAM" data-title="Укрепление плеч для волейболистов" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">💪</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge zone">Плечо</span>
+              <span class="badge level-easy">Начальный</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Плечо и ротаторная манжета</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Упражнения с резинкой для укрепления ротаторной манжеты и профилактики импинджмента.</p>
+          </div>
+        </div>
+
+        <!-- VIDEO 4: Core training -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="NG9qbvAN3gQ" data-title="Тренировка кора для волейболистов" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">🧘</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge zone">Кор</span>
+              <span class="badge level-med">Средний</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Кор — защита позвоночника</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Функциональная тренировка кора для волейболистов: планки, мёртвая жука, Pallof press.</p>
+          </div>
+        </div>
+
+        <!-- VIDEO 5: Warm-up routine -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="9stnrpOW38I" data-title="Разминка волейболиста перед игрой" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">🔥</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge" style="background:rgba(50,200,120,.1);color:#32C878;">Разминка</span>
+              <span class="badge level-easy">Начальный</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Динамическая разминка 10 минут</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Полный комплекс разминки перед тренировкой или игрой: активация суставов, мышц и нейромышечной системы.</p>
+          </div>
+        </div>
+
+        <!-- VIDEO 6: Stretching cool-down -->
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:transform .3s,border-color .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,.06)'">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <div class="video-embed" data-yt="6mTu2DS5lFI" data-title="Заминка и растяжка волейболиста" onclick="loadYouTube(this)" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+              <div class="video-embed-icon">❄️</div>
+              <div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+          <div style="padding:20px 24px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <span class="badge" style="background:rgba(100,180,255,.1);color:#64B4FF;">Растяжка</span>
+              <span class="badge level-easy">Начальный</span>
+            </div>
+            <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;">Заминка и растяжка после игры</h4>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Статическая растяжка для восстановления после тренировки: снижение риска мышечной боли и ускорение восстановления.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider" style="margin:0 0 72px;"></div>
+
+    <!-- EXERCISE FILTER -->
+    <div class="section-tag" style="margin-bottom:20px;">Упражнения</div>
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3vw,44px);color:var(--white);margin-bottom:12px;">Целевые <em style="color:var(--accent);font-style:normal;">упражнения</em></h3>
+    <p style="font-size:15px;color:var(--muted);margin-bottom:36px;max-width:560px;">Фильтруй по зоне тела и выбирай упражнения под свой уровень подготовки.</p>
+
+    <div style="display:flex;gap:10px;margin-bottom:40px;flex-wrap:wrap;" id="exercise-filter">
+      <button class="filter-btn active" onclick="filterEx('all',this)" style="padding:8px 20px;background:var(--accent);color:var(--dark);border:none;border-radius:4px;font-family:Mulish;font-weight:800;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Все</button>
+      <button class="filter-btn" onclick="filterEx('ankle',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Голеностоп</button>
+      <button class="filter-btn" onclick="filterEx('knee',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Колено</button>
+      <button class="filter-btn" onclick="filterEx('shoulder',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Плечо</button>
+      <button class="filter-btn" onclick="filterEx('core',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Кор</button>
+      <button class="filter-btn" onclick="filterEx('wrist',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Запястье</button>
+      <button class="filter-btn" onclick="filterEx('stretch',this)" style="padding:8px 20px;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);border-radius:4px;font-family:Mulish;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Растяжка</button>
+    </div>
+
+    <div class="exercise-grid" id="exercise-grid">
+      <div class="ex-card reveal" data-zone="ankle">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(232,255,0,.05),rgba(232,255,0,.12))">🦶</div>
+        <div class="ex-card-body">
+          <h3>Стойка на одной ноге</h3>
+          <p>Баланс на неустойчивой поверхности. Укрепляет пропроцепцию и мышцы-стабилизаторы голеностопа.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 30 сек</strong> на каждую ногу. Глаза закрыты — усложнённый вариант.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Голеностоп</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="ankle">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(232,255,0,.05),rgba(232,255,0,.12))">⬆️</div>
+        <div class="ex-card-body">
+          <h3>Подъёмы на носки (эксцентрические)</h3>
+          <p>Поднимайся двумя ногами, опускайся медленно на одной. Укрепляет ахиллово сухожилие.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 15 повт.</strong> Опускание — 4 секунды. На краю ступени.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Голеностоп</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="knee">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,77,28,.05),rgba(255,77,28,.12))">🦵</div>
+        <div class="ex-card-body">
+          <h3>Эксцентрические приседания (Nordic)</h3>
+          <p>Медленное опускание корпуса назад — нагружает сухожилие надколенника эксцентрически.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 8–12 повт.</strong> Опускание — 5 сек. Требует фиксации ног.</div>
+          <div class="ex-badges">
+            <span class="badge level-hard">Продвинутый</span>
+            <span class="badge zone">Колено</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="knee">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,77,28,.05),rgba(255,77,28,.12))">🏋️</div>
+        <div class="ex-card-body">
+          <h3>Болгарские сплит-приседания</h3>
+          <p>Задняя нога на скамье. Укрепляет квадрицепс и стабилизаторы коленного сустава.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">4 × 10 повт.</strong> на каждую ногу. Колено над стопой.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Колено</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="shoulder">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(160,128,255,.05),rgba(160,128,255,.12))">💪</div>
+        <div class="ex-card-body">
+          <h3>Внешняя ротация с резиной</h3>
+          <p>Резинка зафиксирована, локоть прижат к телу. Укрепляет ротаторную манжету (внешние ротаторы).</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 20 повт.</strong> на каждую руку. Медленно и подконтрольно.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Плечо</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="shoulder">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(160,128,255,.05),rgba(160,128,255,.12))">🤸</div>
+        <div class="ex-card-body">
+          <h3>Sleeper stretch (растяжка капсулы)</h3>
+          <p>Лёжа на боку, рука горизонтально, другой рукой давишь запястье вниз. Растягивает заднюю капсулу плеча.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 60 сек</strong> на каждую сторону. Нет острой боли!</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Плечо</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="core">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,200,50,.05),rgba(255,200,50,.12))">🧘</div>
+        <div class="ex-card-body">
+          <h3>Планка на нестабильной поверхности</h3>
+          <p>Локти на гимнастическом ролике или мяче. Активирует глубокие мышцы кора (m. transversus abdominis).</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 40 сек.</strong> Поясница не провисает.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Кор</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="core">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,200,50,.05),rgba(255,200,50,.12))">🔄</div>
+        <div class="ex-card-body">
+          <h3>Русский твист с медбол</h3>
+          <p>Наклон 45°, ноги подняты. Вращение корпуса с мячом. Укрепляет косые мышцы живота.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 20 повт.</strong> (10 на сторону). Медбол 2–4 кг.</div>
+          <div class="ex-badges">
+            <span class="badge level-hard">Продвинутый</span>
+            <span class="badge zone">Кор</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="ankle">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(232,255,0,.05),rgba(232,255,0,.12))">🔁</div>
+        <div class="ex-card-body">
+          <h3>Прыжки через конус (боковые)</h3>
+          <p>Серия боковых прыжков через низкий барьер с мягким приземлением. Тренирует пропроцепцию и силу голеностопа.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">4 × 10 повт.</strong> Акцент на мягкое, тихое приземление.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Голеностоп</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="ankle">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(232,255,0,.05),rgba(232,255,0,.12))">🦶</div>
+        <div class="ex-card-body">
+          <h3>Алфавит стопой</h3>
+          <p>Пальцем ноги «рисуй» все буквы алфавита в воздухе. Активирует все мышцы голеностопа и ускоряет восстановление после растяжения.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">1–2 раза в день</strong> при болях или в период реабилитации.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Голеностоп</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="knee">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,77,28,.05),rgba(255,77,28,.12))">🏃</div>
+        <div class="ex-card-body">
+          <h3>Выпады с наклоном корпуса</h3>
+          <p>Классический выпад вперёд с небольшим наклоном корпуса (10°). Имитирует позицию игрока в защите и укрепляет бёдра.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 12 повт.</strong> на каждую сторону. Темп 2–1–2.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Колено</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="knee">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,77,28,.05),rgba(255,77,28,.12))">⬇️</div>
+        <div class="ex-card-body">
+          <h3>Приседание «пистолет» (с поддержкой)</h3>
+          <p>Приседание на одной ноге с поддержкой за стену или TRX. Мощный инструмент для профилактики дисбаланса между ногами.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 6 повт.</strong> на каждую ногу. Колено над 2–3 пальцем.</div>
+          <div class="ex-badges">
+            <span class="badge level-hard">Продвинутый</span>
+            <span class="badge zone">Колено</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="shoulder">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(160,128,255,.05),rgba(160,128,255,.12))">🤸</div>
+        <div class="ex-card-body">
+          <h3>Y-T-W-L с гантелями</h3>
+          <p>Лёжа на наклонной скамье лицом вниз, поднимай руки в позиции Y, T, W и L. Укрепляет заднюю дельту и ромбовидные мышцы.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 10 повт.</strong> каждой буквы. Вес 2–4 кг.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Плечо</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="shoulder">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(160,128,255,.05),rgba(160,128,255,.12))">🔄</div>
+        <div class="ex-card-body">
+          <h3>Отжимания от стены (лопаточные)</h3>
+          <p>Стоя у стены, отжимайся, концентрируясь на сведении и разведении лопаток. Укрепляет передние зубчатые мышцы — стабилизаторы лопатки.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 15 повт.</strong> Максимальное разведение лопаток.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Плечо</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="core">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,200,50,.05),rgba(255,200,50,.12))">🐢</div>
+        <div class="ex-card-body">
+          <h3>Мёртвая жука (Dead Bug)</h3>
+          <p>Лёжа на спине, поясница прижата. Попеременно вытягиваешь противоположную руку и ногу. Идеальное упражнение для кора без нагрузки на позвоночник.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 10 повт.</strong> Поясница не отрывается от пола.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge zone">Кор</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="core">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(255,200,50,.05),rgba(255,200,50,.12))">🏋️</div>
+        <div class="ex-card-body">
+          <h3>Pallof Press с резинкой</h3>
+          <p>Резинка закреплена сбоку. Жмёшь руки прямо перед собой — кор сопротивляется вращению. Прямая имитация антиротационной работы при приёме.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 12 повт.</strong> на каждую сторону. Медленно и контролируемо.</div>
+          <div class="ex-badges">
+            <span class="badge level-med">Средний</span>
+            <span class="badge zone">Кор</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="wrist">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(100,220,255,.05),rgba(100,220,255,.12))">🤚</div>
+        <div class="ex-card-body">
+          <h3>Сгибание и разгибание запястья</h3>
+          <p>Сидя, предплечье на колене. Гантель 1–2 кг — поднять кистью вверх (разгибание) и вниз (сгибание). Укрепляет мышцы-сгибатели и разгибатели кисти.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 15 повт.</strong> каждое направление. Медленно, без инерции.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge" style="background:rgba(100,220,255,.1);color:#64DCFF;">Запястье</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-2" data-zone="wrist">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(100,220,255,.05),rgba(100,220,255,.12))">✊</div>
+        <div class="ex-card-body">
+          <h3>Сжимание мяча для реабилитации</h3>
+          <p>Сжимай мяч (стресс-болл или теннисный) с различным уровнем усилия. Укрепляет мышцы кисти и улучшает кровообращение после травм пальцев.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 30 сжатий</strong> каждой рукой. Отдых 30 сек между подходами.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge" style="background:rgba(100,220,255,.1);color:#64DCFF;">Запястье</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal" data-zone="stretch">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(50,200,120,.05),rgba(50,200,120,.12))">🧘</div>
+        <div class="ex-card-body">
+          <h3>Растяжка квадрицепса стоя</h3>
+          <p>Стоя на одной ноге, согни другую назад, держи за стопу. Растягивает передний отдел бедра — главную рабочую группу в прыжках.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">3 × 30 сек</strong> на каждую ногу. После тренировки обязательно!</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge" style="background:rgba(50,200,120,.1);color:#32C878;">Растяжка</span>
+          </div>
+        </div>
+      </div>
+      <div class="ex-card reveal reveal-delay-1" data-zone="stretch">
+        <div class="ex-card-img" style="background:linear-gradient(135deg,rgba(50,200,120,.05),rgba(50,200,120,.12))">🙆</div>
+        <div class="ex-card-body">
+          <h3>Растяжка грудного отдела на ролике</h3>
+          <p>Ролик поперёк позвоночника, руки за головой. Прогибайся назад. Компенсирует «сутулость» от постоянных движений вперёд в игре.</p>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--white)">2 × 60 сек</strong> Медленное движение по всему грудному отделу.</div>
+          <div class="ex-badges">
+            <span class="badge level-easy">Начальный</span>
+            <span class="badge" style="background:rgba(50,200,120,.1);color:#32C878;">Растяжка</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+    <div class="foot-copy">© 2024 VolleyGuard — Спортивная медицина и профилактика</div>
+    <div class="foot-links">
+      <a href="#" onclick="showPage('firstaid',null)">Первая помощь →</a>
+    </div>
+  </footer>
+</div>
+  <section style="background:var(--dark2);border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);">
+    <div class="section-tag" style="margin-bottom:20px;">Программа</div>
+    <h2 class="section-title">Недельный <em>план</em> профилактики</h2>
+    <p class="section-lead">Рекомендованная структура тренировочной недели для снижения риска травм. Адаптируй под своё расписание игр.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:56px;">
+      <!-- Mon -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">ПОНЕДЕЛЬНИК</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Нижняя часть тела</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Болгарские сплит-приседания</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Эксцентрические подъёмы на носки</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Стойка на одной ноге</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Растяжка квадрицепса</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">~40 минут</div>
+      </div>
+      <!-- Tue -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">ВТОРНИК</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Тренировка / Игра</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Разминка 15 мин</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Основная тренировка</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Заминка 10 мин</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Тейпирование при необходимости</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">Игровой день</div>
+      </div>
+      <!-- Wed -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">СРЕДА</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Восстановление</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Лёгкое плавание или езда на велосипеде</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Foam roller (МФР)</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Статическая растяжка</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Алфавит стопой</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">~30 минут</div>
+      </div>
+      <!-- Thu -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">ЧЕТВЕРГ</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Верхняя часть тела и кор</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Y-T-W-L упражнения</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Внешняя ротация с резинкой</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Dead Bug + Pallof Press</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Русский твист с медбол</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">~45 минут</div>
+      </div>
+      <!-- Fri -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">ПЯТНИЦА</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Тренировка / Игра</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Разминка 15 мин</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Основная тренировка</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Заминка + растяжка грудного отдела</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#FF4D1C;font-size:10px;">◆</span>Sleeper stretch для плеч</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">Игровой день</div>
+      </div>
+      <!-- Sat -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);transition:border-color .3s;" onmouseover="this.style.borderColor='rgba(232,255,0,.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,.04)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;">СУББОТА</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Комплексная тренировка</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Nordic curl + приседания пистолет</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Боковые прыжки через конус</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Планка на нестабильной поверхности</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:var(--accent);font-size:10px;">◆</span>Полная растяжка тела</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;">~60 минут</div>
+      </div>
+      <!-- Sun -->
+      <div style="background:var(--dark3);border-radius:8px;padding:24px;border:1px solid rgba(255,255,255,.04);border:1px solid rgba(50,200,120,.15)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:#32C878;margin-bottom:12px;">ВОСКРЕСЕНЬЕ</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Полный отдых</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Никаких интенсивных нагрузок</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Прогулка или лёгкая йога</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>8+ часов сна</li>
+          <li style="font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;"><span style="color:#32C878;font-size:10px;">◆</span>Полноценное питание (белок + ω-3)</li>
+        </ul>
+        <div style="margin-top:14px;font-size:11px;font-weight:700;color:#32C878;letter-spacing:1px;">Восстановление = рост</div>
+      </div>
+    </div>
+
+    <!-- NUTRITION & RECOVERY TIPS -->
+    <div class="section-tag" style="margin-bottom:20px;">Восстановление</div>
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,2.5vw,38px);color:var(--white);margin-bottom:32px;">Питание и <em style="color:var(--accent);font-style:normal;">сон</em> как защита от травм</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;">
+      <div style="background:var(--dark);border:1px solid rgba(232,255,0,.12);border-radius:10px;padding:28px;">
+        <div style="font-size:32px;margin-bottom:14px;">💧</div>
+        <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Гидратация</h4>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">Даже небольшое обезвоживание (2% веса тела) снижает проприоцепцию и координацию — главные защитники от травм. Норма: 35–40 мл/кг в день, +500 мл за каждый час игры.</p>
+      </div>
+      <div style="background:var(--dark);border:1px solid rgba(232,255,0,.12);border-radius:10px;padding:28px;">
+        <div style="font-size:32px;margin-bottom:14px;">🥩</div>
+        <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Белок для сухожилий</h4>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">Коллагенсодержащие продукты (желатин, костный бульон) + витамин С за 30–60 мин до тренировки ускоряют синтез коллагена в сухожилиях. Целевой белок: 1.6–2 г/кг.</p>
+      </div>
+      <div style="background:var(--dark);border:1px solid rgba(232,255,0,.12);border-radius:10px;padding:28px;">
+        <div style="font-size:32px;margin-bottom:14px;">😴</div>
+        <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Сон — лучший восстановитель</h4>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">Исследования NCAA показывают: спортсмены, спящие менее 8 часов, получают травмы на 1.7 раза чаще. Во сне выделяется гормон роста, восстанавливающий ткани.</p>
+      </div>
+      <div style="background:var(--dark);border:1px solid rgba(232,255,0,.12);border-radius:10px;padding:28px;">
+        <div style="font-size:32px;margin-bottom:14px;">🫚</div>
+        <h4 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px;">Омега-3 против воспаления</h4>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">2–3 г EPA+DHA в день снижают хроническое воспаление в суставах и ускоряют восстановление после микротравм. Источники: жирная рыба, льняное масло, рыбий жир.</p>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 5: FIRST AID
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-firstaid">
+  <section>
+    <div class="section-tag">Первая помощь</div>
+    <h2 class="section-title">Действуй <em>правильно</em></h2>
+    <p class="section-lead">Немедленные правильные действия снижают тяжесть последствий травмы и ускоряют восстановление.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-bottom:64px;">
+      <div style="background:rgba(255,77,28,.08);border:1px solid rgba(255,77,28,.3);border-radius:12px;padding:32px;transition:all .35s;cursor:default;"
+           onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:36px;margin-bottom:16px;">🧊</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:12px;">R — Rest (Покой)</h3>
+        <p style="font-size:14px;line-height:1.7;color:var(--muted)">Немедленно прекрати нагрузку на повреждённую область. Не «доигрывай», не проверяй «как» — это многократно ухудшает травму.</p>
+      </div>
+      <div style="background:rgba(0,150,255,.08);border:1px solid rgba(0,150,255,.3);border-radius:12px;padding:32px;transition:all .35s;cursor:default;"
+           onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:36px;margin-bottom:16px;">❄️</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:12px;">I — Ice (Лёд)</h3>
+        <p style="font-size:14px;line-height:1.7;color:var(--muted)">Лёд через ткань на 15–20 минут каждые 2–3 часа в первые 48–72 часа. Никогда не прикладывай лёд прямо к коже — риск обморожения!</p>
+      </div>
+      <div style="background:rgba(50,200,120,.08);border:1px solid rgba(50,200,120,.3);border-radius:12px;padding:32px;transition:all .35s;cursor:default;"
+           onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:36px;margin-bottom:16px;">🩹</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:12px;">C — Compression (Давление)</h3>
+        <p style="font-size:14px;line-height:1.7;color:var(--muted)">Эластичный бинт снижает отёк. Бинтуй от дальнего конца к проксимальному. Пальцы должны быть тёплыми — если холодеют, ослабь.</p>
+      </div>
+      <div style="background:rgba(255,200,50,.08);border:1px solid rgba(255,200,50,.3);border-radius:12px;padding:32px;transition:all .35s;cursor:default;"
+           onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:36px;margin-bottom:16px;">📐</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:12px;">E — Elevation (Возвышение)</h3>
+        <p style="font-size:14px;line-height:1.7;color:var(--muted)">Подними повреждённую конечность выше уровня сердца — уменьшает отёк. Для ноги — положи подушку под голень.</p>
+      </div>
+    </div>
+
+    <div class="alert">
+      <strong>⚠ Когда НЕМЕДЛЕННО к врачу:</strong> ощущение «щелчка» в момент травмы, невозможность встать на ногу / пошевелить суставом, видимая деформация, онемение или бледность, нарастающий отёк в течение 30 минут. Это признаки разрыва или перелома!
+    </div>
+
+    <h2 class="section-title" style="margin-top:60px;">По типу <em>травмы</em></h2>
+    <div class="two-col">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div style="background:var(--dark2);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04);">
+            <div style="background:rgba(255,77,28,.12);padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.04);">
+              <h3 style="font-size:16px;font-weight:700;color:var(--accent2)">🦶 Растяжение голеностопа</h3>
+            </div>
+            <div style="padding:20px 24px;">
+              <ul class="check-list" style="gap:10px;">
+                <li style="font-size:13px;">RICE в первые 72 часа</li>
+                <li style="font-size:13px;">Аспирин/ибупрофен (не сразу — через 2–4 часа)</li>
+                <li style="font-size:13px;">Функциональный тейп или ортез через 48–72 ч</li>
+                <li style="font-size:13px;">Рентген при сильной боли (правила Ottawa)</li>
+              </ul>
+            </div>
+          </div>
+          <div style="background:var(--dark2);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04);">
+            <div style="background:rgba(232,255,0,.08);padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.04);">
+              <h3 style="font-size:16px;font-weight:700;color:var(--accent)">🤚 Травма пальца</h3>
+            </div>
+            <div style="padding:20px 24px;">
+              <ul class="check-list" style="gap:10px;">
+                <li style="font-size:13px;">Buddy taping (шина к соседнему пальцу)</li>
+                <li style="font-size:13px;">Лёд 15 мин каждые 2 часа</li>
+                <li style="font-size:13px;">Рентген обязателен при деформации</li>
+                <li style="font-size:13px;">Не пытаться «вправить» самостоятельно!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div style="background:var(--dark2);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04);">
+            <div style="background:rgba(160,128,255,.1);padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.04);">
+              <h3 style="font-size:16px;font-weight:700;color:#B0A0FF">💪 Боль в плече</h3>
+            </div>
+            <div style="padding:20px 24px;">
+              <ul class="check-list" style="gap:10px;">
+                <li style="font-size:13px;">Покой от нагрузок выше головы</li>
+                <li style="font-size:13px;">Лёд при острой боли, тепло при хронической</li>
+                <li style="font-size:13px;">НПВС при выраженном воспалении</li>
+                <li style="font-size:13px;">МРТ при нестабильности или слабости</li>
+              </ul>
+            </div>
+          </div>
+          <div style="background:var(--dark2);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04);">
+            <div style="background:rgba(255,77,28,.12);padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.04);">
+              <h3 style="font-size:16px;font-weight:700;color:var(--accent2)">🦴 Боль в колене</h3>
+            </div>
+            <div style="padding:20px 24px;">
+              <ul class="check-list" style="gap:10px;">
+                <li style="font-size:13px;">Прекратить прыжки, заменить на плавание/велосипед</li>
+                <li style="font-size:13px;">Эксцентрические упражнения (после снятия острой боли)</li>
+                <li style="font-size:13px;">УЗИ для исключения разрыва связок</li>
+                <li style="font-size:13px;">Физиотерапия: ультразвук, магнит, ударно-волновая</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-banner">
+    <div>
+      <h2>НЕ ДОВОДИ ДО ТРАВМЫ</h2>
+      <p>Выполняй профилактические упражнения и возвращайся на площадку здоровым</p>
+    </div>
+    <button class="btn-dark" onclick="showPage('prevention', null)">
+      Программа профилактики →
+    </button>
+  </div>
+
+  <footer>
+    <div class="logo"><span>V</span>OLLEY<span>GUARD</span></div>
+    <div class="foot-copy">© 2024 VolleyGuard — Спортивная медицина и профилактика</div>
+    <div class="foot-links">
+      <a href="#" onclick="showPage('home',null)">На главную</a>
+    </div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// 0. PERFORMANCE FLAGS
+// ════════════════════════════════════════════════
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = window.innerWidth <= 900;
+
+// ════════════════════════════════════════════════
+// 1. CURSOR
+// ════════════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+});
+document.addEventListener('mouseover', e => {
+  if (e.target.closest('button,a,.card,.ex-card,.hotspot,.acc-header,.tl-item')) {
+    cursor.classList.add('big');
+  } else {
+    cursor.classList.remove('big');
+  }
+});
+
+// ════════════════════════════════════════════════
+// 2. PARTICLE TRAIL (mouse sparks)
+// ════════════════════════════════════════════════
+const pCanvas = document.getElementById('particle-canvas');
+const pCtx = pCanvas.getContext('2d');
+let particles = [];
+
+function resizeParticleCanvas() {
+  pCanvas.width  = window.innerWidth;
+  pCanvas.height = window.innerHeight;
+}
+resizeParticleCanvas();
+window.addEventListener('resize', resizeParticleCanvas);
+
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+  if (reduceMotion) return;
+  mouseX = e.clientX; mouseY = e.clientY;
+  for (let i = 0; i < 3; i++) {
+    if (particles.length > 180) break;
+    particles.push({
+      x: mouseX + (Math.random() - .5) * 10,
+      y: mouseY + (Math.random() - .5) * 10,
+      vx: (Math.random() - .5) * 2.5,
+      vy: (Math.random() - .5) * 2.5 - 1,
+      life: 1,
+      size: Math.random() * 3 + 1,
+      hue: Math.random() > .5 ? 60 : 28  // yellow or orange
+    });
+  }
+}, { passive: true });
+
+function animateParticles() {
+  if (document.hidden) { requestAnimationFrame(animateParticles); return; }
+  pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.05;
+    p.life -= 0.035;
+    p.size *= 0.97;
+    pCtx.save();
+    pCtx.globalAlpha = Math.max(0, p.life * 0.85);
+    pCtx.fillStyle = `hsl(${p.hue}, 100%, 65%)`;
+    pCtx.shadowBlur = 6;
+    pCtx.shadowColor = `hsl(${p.hue}, 100%, 65%)`;
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    pCtx.fill();
+    pCtx.restore();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ════════════════════════════════════════════════
+// 3. THREE.JS VOLLEYBALL BALL
+// ════════════════════════════════════════════════
+(function initBall() {
+  const wrap = document.getElementById('hero-ball-wrap');
+  if (!wrap) return;
+  if (isMobile || reduceMotion) { wrap.style.display = 'none'; return; }
+  const canvas = document.getElementById('ball-canvas');
+  const W = 340, H = 340;
+  canvas.width = W; canvas.height = H;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = true;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 3.2);
+
+  // ─ Ball geometry
+  const geo = new THREE.SphereGeometry(1, 64, 64);
+
+  // ─ Shader material for volleyball look
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a00,
+    roughness: 0.55,
+    metalness: 0.05,
+    emissive: 0xE8FF00,
+    emissiveIntensity: 0.04,
+  });
+
+  // ─ Overlay canvas texture for seam lines
+  const texCanvas = document.createElement('canvas');
+  texCanvas.width = 1024; texCanvas.height = 1024;
+  const tx = texCanvas.getContext('2d');
+
+  // Dark base
+  tx.fillStyle = '#111100';
+  tx.fillRect(0, 0, 1024, 1024);
+
+  // Panel divisions (simplified volleyball seam pattern)
+  tx.strokeStyle = '#E8FF00';
+  tx.lineWidth = 8;
+  tx.shadowBlur = 14;
+  tx.shadowColor = '#E8FF00';
+
+  // Horizontal equator
+  tx.beginPath(); tx.ellipse(512, 512, 480, 90, 0, 0, Math.PI*2); tx.stroke();
+
+  // Top arc seam
+  tx.beginPath(); tx.ellipse(512, 512, 480, 240, Math.PI/3, 0, Math.PI*2); tx.stroke();
+
+  // Bottom arc seam
+  tx.beginPath(); tx.ellipse(512, 512, 480, 240, -Math.PI/3, 0, Math.PI*2); tx.stroke();
+
+  // Vertical seam
+  tx.beginPath(); tx.ellipse(512, 512, 90, 480, 0, 0, Math.PI*2); tx.stroke();
+
+  // Glow spots
+  tx.shadowBlur = 30; tx.lineWidth = 3;
+  tx.strokeStyle = 'rgba(232,255,0,0.35)';
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const cx = 512 + Math.cos(a) * 350;
+    const cy = 512 + Math.sin(a) * 350;
+    tx.beginPath(); tx.arc(cx, cy, 30, 0, Math.PI*2); tx.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(texCanvas);
+  mat.map = texture;
+
+  const ball = new THREE.Mesh(geo, mat);
+  scene.add(ball);
+
+  // ─ Glow sphere
+  const glowGeo = new THREE.SphereGeometry(1.18, 32, 32);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: 0xE8FF00,
+    transparent: true,
+    opacity: 0.04,
+    side: THREE.BackSide,
+  });
+  scene.add(new THREE.Mesh(glowGeo, glowMat));
+
+  // ─ Point glow halo
+  const haloGeo = new THREE.SphereGeometry(1.35, 32, 32);
+  const haloMat = new THREE.MeshBasicMaterial({
+    color: 0xE8FF00,
+    transparent: true,
+    opacity: 0.02,
+    side: THREE.BackSide,
+  });
+  scene.add(new THREE.Mesh(haloGeo, haloMat));
+
+  // ─ Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+  scene.add(ambient);
+
+  const keyLight = new THREE.PointLight(0xE8FF00, 2.5, 10);
+  keyLight.position.set(2, 2, 3);
+  scene.add(keyLight);
+
+  const rimLight = new THREE.PointLight(0xFF4D1C, 1.2, 8);
+  rimLight.position.set(-3, -1, -2);
+  scene.add(rimLight);
+
+  const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  fillLight.position.set(0, 3, 1);
+  scene.add(fillLight);
+
+  // ─ Parallax tracking
+  let targetRotX = 0, targetRotY = 0;
+  let currentRotX = 0, currentRotY = 0;
+  let autoRotY = 0;
+
+  document.addEventListener('mousemove', e => {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    targetRotY = (e.clientX - cx) / cx * 0.4;
+    targetRotX = -(e.clientY - cy) / cy * 0.3;
+
+    // Parallax: move the ball wrap slightly
+    if (wrap) {
+      wrap.style.transform = `translateY(-50%) translate(${(e.clientX - cx) * 0.015}px, ${(e.clientY - cy) * 0.01}px)`;
+    }
+  });
+
+  // ─ Render loop
+  function animateBall() {
+    requestAnimationFrame(animateBall);
+    if (document.hidden || !document.getElementById('page-home')?.classList.contains('active')) return;
+    autoRotY += 0.003;
+    currentRotX += (targetRotX - currentRotX) * 0.05;
+    currentRotY += (targetRotY - currentRotY) * 0.05;
+    ball.rotation.x = currentRotX;
+    ball.rotation.y = autoRotY + currentRotY;
+    ball.rotation.z = Math.sin(autoRotY * 0.3) * 0.05;
+
+    // Pulse glow
+    const pulse = 0.03 + Math.sin(Date.now() * 0.002) * 0.015;
+    glowMat.opacity = pulse;
+    mat.emissiveIntensity = 0.04 + Math.sin(Date.now() * 0.0015) * 0.02;
+
+    renderer.render(scene, camera);
+  }
+  animateBall();
+})();
+
+// ════════════════════════════════════════════════
+// 4. COURT PARALLAX
+// ════════════════════════════════════════════════
+const courtSvg = document.getElementById('court-svg');
+let courtOpacity = 0, courtDir = 1;
+(function pulseCourt() {
+  if (document.hidden || !document.getElementById('page-home')?.classList.contains('active')) {
+    requestAnimationFrame(pulseCourt); return;
+  }
+  courtOpacity += 0.0005 * courtDir;
+  if (courtOpacity > 0.09) courtDir = -1;
+  if (courtOpacity < 0.04) courtDir = 1;
+  if (courtSvg) courtSvg.style.opacity = courtOpacity;
+  requestAnimationFrame(pulseCourt);
+})();
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  if (courtSvg) {
+    courtSvg.style.transform = `translateY(${scrollY * 0.3}px)`;
+  }
+});
+
+// ════════════════════════════════════════════════
+// 5. SCROLL PROGRESS
+// ════════════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  const el = document.querySelector('.page.active');
+  if (!el) return;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// ════════════════════════════════════════════════
+// 6. PAGE NAVIGATION
+// ════════════════════════════════════════════════
+function showPage(name, linkEl) {
+  const pages = document.querySelectorAll('.page');
+  const links  = document.querySelectorAll('.nav-links a');
+
+  const currentPage = document.querySelector('.page.active');
+  if (currentPage) {
+    currentPage.classList.add('leaving');
+    setTimeout(() => currentPage.classList.remove('leaving'), 300);
+  }
+
+  setTimeout(() => {
+    pages.forEach(p => p.classList.remove('active'));
+    links.forEach(l => l.classList.remove('active'));
+
+    const target = document.getElementById('page-' + name);
+    if (target) { target.classList.add('active'); }
+
+    if (linkEl) { linkEl.classList.add('active'); }
+    else {
+      const map = { home: 0, injuries: 1, prevention: 2, exercises: 3, firstaid: 4 };
+      const idx = map[name];
+      if (idx !== undefined) links[idx]?.classList.add('active');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    revealElements();
+    animateBars();
+    animateCounters();
+    initMagneticCards();
+  }, currentPage ? 280 : 0);
+}
+
+// ════════════════════════════════════════════════
+// 7. REVEAL ON SCROLL
+// ════════════════════════════════════════════════
+function revealElements() {
+  const els = document.querySelectorAll('.page.active .reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  els.forEach(el => { el.classList.remove('visible'); observer.observe(el); });
+}
+
+// ════════════════════════════════════════════════
+// 8. BARS ANIMATION
+// ════════════════════════════════════════════════
+function animateBars() {
+  setTimeout(() => {
+    document.querySelectorAll('.page.active .severity-fill').forEach(bar => {
+      bar.style.width = bar.dataset.w + '%';
+    });
+  }, 400);
+}
+
+// ════════════════════════════════════════════════
+// 9. SCOREBOARD COUNTER (tablo effect)
+// ════════════════════════════════════════════════
+function animateCounters() {
+  document.querySelectorAll('.page.active .counter').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    let current = 0;
+    let frame = 0;
+    const chars = '0123456789';
+
+    const interval = setInterval(() => {
+      frame++;
+      // Scramble effect for first ~60% of animation
+      const progress = frame / 50;
+      if (progress < 0.6) {
+        // Show random digit scramble
+        el.textContent = chars[Math.floor(Math.random() * chars.length)];
+        el.style.color = Math.random() > 0.5 ? '#E8FF00' : '#FF4D1C';
+        el.style.textShadow = '0 0 12px currentColor';
+      } else {
+        // Settle to real value
+        current = Math.min(current + target / 20, target);
+        el.textContent = Math.round(current);
+        el.style.color = '';
+        el.style.textShadow = '';
+      }
+      if (frame >= 50 && current >= target) {
+        el.textContent = target;
+        el.style.color = '';
+        el.style.textShadow = '';
+        clearInterval(interval);
+      }
+    }, 28);
+  });
+}
+
+// ════════════════════════════════════════════════
+// 10. MAGNETIC CARD HOVER (3D tilt)
+// ════════════════════════════════════════════════
+function initMagneticCards() {
+  document.querySelectorAll('.page.active .card').forEach(card => {
+    // Inject shine layer if not present
+    if (!card.querySelector('.card-shine')) {
+      const shine = document.createElement('div');
+      shine.className = 'card-shine';
+      card.prepend(shine);
+    }
+
+    if (card.dataset.magneticInit) return;
+    card.dataset.magneticInit = '1';
+    if (reduceMotion) return;
+
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top  + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+      const rotX = -dy * 10;
+      const rotY =  dx * 10;
+      card.style.transform = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-4px) scale(1.02)`;
+      const shine = card.querySelector('.card-shine');
+      if (shine) {
+        const px = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const py = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+        shine.style.setProperty('--mx', px + '%');
+        shine.style.setProperty('--my', py + '%');
+      }
+      // Spin icon
+      const icon = card.querySelector('.card-icon');
+      if (icon) icon.style.transform = `scale(1.1) rotate(${dx * 15}deg)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      const icon = card.querySelector('.card-icon');
+      if (icon) icon.style.transform = '';
+    });
+  });
+}
+
+// ════════════════════════════════════════════════
+// 11. BODY ZONE TOOLTIP
+// ════════════════════════════════════════════════
+const zoneData = {
+  shoulder: {
+    title: '💪 Плечевой сустав',
+    body: 'Ротаторная манжета, импинджмент-синдром. Риск при подаче в прыжке и атаке. Профилактика: укрепление внешних ротаторов.'
+  },
+  wrist: {
+    title: '🤝 Запястье',
+    body: 'Растяжения связок и переломы при падениях. Тейпирование и укрепление мышц-сгибателей снижают риск.'
+  },
+  knee: {
+    title: '🦵 Коленный сустав',
+    body: '«Прыгунковое колено» (тендинопатия надколенника) — самая частая хроническая травма у волейболистов. Лечится эксцентрическими упражнениями.'
+  },
+  ankle: {
+    title: '🦶 Голеностопный сустав',
+    body: 'Самая распространённая острая травма — 42% всех случаев. Происходит при приземлении на чужую ногу или инверсии (подвороте).'
+  },
+  finger: {
+    title: '☝ Пальцы рук',
+    body: 'Разрывы связок и переломы при прямом ударе мячом. Тейпирование пальцев — эффективная профилактика.'
+  },
+  back: {
+    title: '🦴 Поясничный отдел',
+    body: 'Хронические боли от повторяющихся наклонов (приём в защите) и разгибаний (подача). Укрепление кора снижает нагрузку на позвоночник.'
+  }
+};
+
+function showZone(zone) {
+  const data = zoneData[zone];
+  if (!data) return;
+  const tt = document.getElementById('zone-tooltip');
+  const details = document.getElementById('zone-details');
+
+  document.getElementById('tooltip-title').textContent = data.title;
+  document.getElementById('tooltip-body').textContent  = data.body;
+  tt.classList.add('visible');
+
+  const riskMap = { shoulder: 70, wrist: 40, knee: 85, ankle: 95, finger: 60, back: 50 };
+  const colorMap = { shoulder: '#A080FF', wrist: '#E8FF00', knee: '#FF4D1C', ankle: '#FF4D1C', finger: '#E8FF00', back: '#FFB030' };
+  const severity = riskMap[zone];
+  const color = colorMap[zone];
+
+  details.innerHTML = `
+    <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:24px;">
+      <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px;">${data.title}</h3>
+      <p style="font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:20px;">${data.body}</p>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:8px;">УРОВЕНЬ РИСКА: ${severity}%</div>
+      <div class="severity-bar">
+        <div class="severity-fill" data-w="${severity}" style="width:0%;background:${color};transition:width 1s cubic-bezier(.22,.68,0,1.2)"></div>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    const fill = details.querySelector('.severity-fill');
+    if (fill) fill.style.width = fill.dataset.w + '%';
+  }, 100);
+
+  setTimeout(() => tt.classList.remove('visible'), 3000);
+}
+
+// ════════════════════════════════════════════════
+// 12. ACCORDION
+// ════════════════════════════════════════════════
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const body = item.querySelector('.acc-body');
+  const isOpen = item.classList.contains('open');
+
+  document.querySelectorAll('.acc-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.acc-body').style.maxHeight = '0';
+  });
+
+  if (!isOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+// ════════════════════════════════════════════════
+// 13. EXERCISE FILTER
+// ════════════════════════════════════════════════
+function filterEx(zone, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--muted)';
+    b.style.borderColor = 'rgba(255,255,255,.15)';
+  });
+  btn.style.background = 'var(--accent)';
+  btn.style.color = 'var(--dark)';
+  btn.style.borderColor = 'transparent';
+
+  const cards = document.querySelectorAll('#exercise-grid .ex-card');
+  cards.forEach(card => {
+    const match = zone === 'all' || card.dataset.zone === zone;
+    card.style.transition = 'opacity .3s, transform .3s';
+    card.style.opacity = match ? '1' : '0.2';
+    card.style.transform = match ? 'scale(1)' : 'scale(0.97)';
+    card.style.pointerEvents = match ? 'auto' : 'none';
+  });
+}
+
+// ════════════════════════════════════════════════
+// 14. RISK CALCULATOR
+// ════════════════════════════════════════════════
+const riskAnswers = {};
+
+function selectRiskOpt(btn) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.risk-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  riskAnswers[group.dataset.q] = {
+    w: parseInt(btn.dataset.w, 10),
+    zone: btn.dataset.zone || '',
+    text: btn.textContent.trim()
+  };
+}
+
+function calcRisk() {
+  const keys = ['position', 'freq', 'warmup', 'history', 'gear'];
+  const result = document.getElementById('risk-result');
+
+  if (keys.some(k => !riskAnswers[k])) {
+    result.innerHTML = `<div class="alert" style="margin-bottom:0;"><strong>⚠ Заполни все 5 пунктов</strong> — без полной анкеты расчёт риска будет неточным.</div>`;
+    return;
+  }
+
+  const score = Math.round(keys.reduce((s, k) => s + riskAnswers[k].w, 0) / keys.length);
+
+  let color, levelText;
+  if (score < 35)      { color = '#64DC64';      levelText = 'Низкий'; }
+  else if (score < 65) { color = 'var(--accent)'; levelText = 'Средний'; }
+  else                 { color = 'var(--accent2)'; levelText = 'Высокий'; }
+
+  const pos = riskAnswers.position.text;
+  const recs = [];
+
+  if (riskAnswers.warmup.w >= 50) {
+    recs.push('Без полноценной разминки риск растёт резко — выполняй программу FIFA 11+ выше перед каждой тренировкой (доказано снижает травмы до 73%).');
+  }
+  if (['Доигровщик', 'Диагональный', 'Связующий', 'Центральный блокирующий'].includes(pos)) {
+    recs.push(`Позиция «${pos}» — это много прыжков и движений над головой. Добавь эксцентрические упражнения для колена и укрепление ротаторной манжеты.`);
+  }
+  if (pos === 'Либеро') {
+    recs.push('Игра в защите связана с падениями и приёмом — тейпируй пальцы и запястья и используй наколенники при каждом выходе на площадку.');
+  }
+  if (riskAnswers.history.zone) {
+    recs.push(`У тебя уже были травмы ${riskAnswers.history.zone} — в разделе «Упражнения» есть видео именно для профилактики повторных травм этой зоны.`);
+  }
+  if (riskAnswers.gear.w >= 50) {
+    recs.push('Защитная экипировка снижает тяжесть острых травм пальцев и коленей — добавь наколенники и тейп хотя бы на игровые дни.');
+  }
+  if (riskAnswers.freq.w >= 80) {
+    recs.push('При 5+ тренировках в неделю критична фаза восстановления: сон менее 8 часов повышает риск травм почти в 2 раза, оставляй минимум 1 день отдыха.');
+  }
+  recs.push('Любая боль во время игры — сигнал остановиться. «Доигрывание через боль» — главная причина перехода острой травмы в хроническую.');
+
+  result.innerHTML = `
+    <div class="risk-score-row">
+      <div class="risk-score-num" style="color:${color}">${score}%</div>
+      <div class="risk-score-label" style="background:${color};color:var(--dark)">${levelText} риск</div>
+    </div>
+    <div class="severity-bar"><div class="severity-fill" data-w="${score}" style="width:0%;background:${color}"></div></div>
+    <ul class="risk-rec-list">
+      ${recs.slice(0, 5).map(r => `<li>${r}</li>`).join('')}
+    </ul>`;
+
+  setTimeout(() => {
+    const fill = result.querySelector('.severity-fill');
+    if (fill) fill.style.width = fill.dataset.w + '%';
+  }, 80);
+}
+
+// ════════════════════════════════════════════════
+// 15. LAZY YOUTUBE EMBEDS
+// ════════════════════════════════════════════════
+function loadYouTube(el) {
+  const id = el.dataset.yt;
+  const title = el.dataset.title || 'YouTube video player';
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+  iframe.title = title;
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+  iframe.allowFullscreen = true;
+  iframe.style.position = 'absolute';
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  el.replaceWith(iframe);
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+revealElements();
+animateBars();
+animateCounters();
+initMagneticCards();
+</script>
+</body>
+</html>
